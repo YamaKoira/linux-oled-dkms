@@ -1,2 +1,5 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+* text=auto eol=lf
+PKGBUILD text eol=lf
+dkms.conf text eol=lf
+i915-oled.conf text eol=lf
+linux-legacy-oled-brightness.patch text eol=lf
