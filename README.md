@@ -10,8 +10,6 @@ On mainline Linux kernels, the 2016 Lenovo ThinkPad X1 Yoga (1st Gen) OLED scree
 
 Chris Xiong ([Chrisoft](https://chrisoft.org/blog/post/2025-04-28.html)) reverse-engineered Lenovo's original debug driver and created a patch that ports the legacy DPCD backlight handling into the `i915` driver module.
 
-While a Debian-focused DKMS port exists elsewhere, this repository focuses specifically on providing a clean, self-contained **DKMS package for Arch Linux**, allowing you to follow mainline kernel updates without manually recompiling the full Linux kernel every time.
-
 ## 📋 What This Package Does
 
 When built and installed via `makepkg`, this package:
