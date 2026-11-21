@@ -72,10 +72,25 @@ prepare() {
     sed -i 's|#define TRACE_INCLUDE_PATH ../../drivers/gpu/drm/i915/display.*|#define TRACE_INCLUDE_PATH display|' \
         drivers/gpu/drm/i915/display/intel_display_trace.h
 
-    # Warn if a future kernel adds a path the seds above did not catch
-    if grep -rqE 'define TRACE_INCLUDE_PATH +\.\./' drivers/gpu/drm/i915; then
-        warning "Some TRACE_INCLUDE_PATH lines are still relative to the kernel tree:"
-        grep -rnE 'define TRACE_INCLUDE_PATH +\.\./' drivers/gpu/drm/i915 || true
+    # Fail if a future kernel adds a path the seds above did not catch.
+    # Leaving these paths untouched can make the out-of-tree DKMS build fail
+    # later with a confusing trace-header include error.
+    if grep -rnE '^[[:space:]]*#define TRACE_INCLUDE_PATH[[:space:]]+\.\./' \
+        drivers/gpu/drm/i915; then
+        error "Unconverted TRACE_INCLUDE_PATH found; the DKMS path fix needs updating."
+        return 1
+    fi
+
+    # These two headers need their own include paths in the staged DKMS tree.
+    if ! grep -qE '^[[:space:]]*#define TRACE_INCLUDE_PATH[[:space:]]+gvt[[:space:]]*$' \
+        drivers/gpu/drm/i915/gvt/trace.h; then
+        error "Failed to set TRACE_INCLUDE_PATH to 'gvt' in gvt/trace.h."
+        return 1
+    fi
+    if ! grep -qE '^[[:space:]]*#define TRACE_INCLUDE_PATH[[:space:]]+display[[:space:]]*$' \
+        drivers/gpu/drm/i915/display/intel_display_trace.h; then
+        error "Failed to set TRACE_INCLUDE_PATH to 'display' in intel_display_trace.h."
+        return 1
     fi
 }
 

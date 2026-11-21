@@ -1,0 +1,8 @@
+# makepkg build output
+src/
+pkg/
+*.pkg.tar.*
+*.tar.xz
+
+# Panel data blob: extracted from Lenovo's driver, not redistributable
+*.bin

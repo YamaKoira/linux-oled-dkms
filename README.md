@@ -6,7 +6,7 @@ Fair warning: a lot of this was written with AI help. It works on my machine, wh
 
 ## Background
 
-On mainline Linux, the OLED screen in the 2016 X1 Yoga has no working hardware brightness control. Chris Xiong ([Chrisoft](https://chrisoft.org/blog/post/2025-04-28.html)) reverse-engineered Lenovo's original debug driver and wrote a patch that ports the legacy DPCD backlight handling into i915. This package just wraps his work so it's easy to install on Arch and keeps building across kernel updates via DKMS.
+On mainline Linux, the OLED screen in the 2016 X1 Yoga has no working hardware brightness control. Chris Xiong ([Chrisoft](https://chrisoft.org/blog/post/2025-04-28.html)) reverse-engineered Lenovo's original debug driver and wrote a patch that ports the legacy DPCD backlight handling into i915. This package just wraps his work so it's easy to install on Arch, and DKMS rebuilds the module automatically for kernel updates within the same series (see [After a kernel update](#after-a-kernel-update)).
 
 ## What it does
 
@@ -51,6 +51,18 @@ cat /sys/module/i915/parameters/enable_dpcd_backlight
 ```
 
 This should print `99`. After that, your brightness keys, desktop slider, `brightnessctl` or `light` should all work.
+
+## After a kernel update
+
+DKMS ships the i915 source from the kernel version you built the package against (say 7.2.14). On a patch update (7.2.14 to 7.2.15) it rebuilds that same source against the new headers, which normally just works.
+
+On a new kernel series (7.2 to 7.3) the old source will most likely not build. i915 then falls back to the unpatched in-tree driver and brightness control disappears. Rebuild the package against the new kernel to fix it:
+
+```bash
+makepkg -si
+```
+
+The `PKGBUILD` stops early with a clear message if the patch no longer applies to the new kernel, or if the trace include paths need a new fix. In that case the patch needs a rebase.
 
 ## Credits
 
